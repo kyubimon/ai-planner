@@ -7,16 +7,15 @@ import yaml
 from dotenv import load_dotenv
 from fastmcp import FastMCP
 
-# from fastmcp.typing import ToolContext # Si necesitas contexto
-
-# --- Cargar .env y Configurar Gemini ---
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    raise ValueError("ERROR CRÍTICO: GEMINI_API_KEY no definida. Crea un archivo .env.")
+    raise ValueError("API key not found")
 
 genai.configure(api_key=api_key)
-GEMINI_MODEL_NAME = "gemini-1.5-flash"
+GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME")
+if not GEMINI_MODEL_NAME:
+    raise ValueError("Model name not found")
 
 
 # --- Helper Functions ---
@@ -53,8 +52,10 @@ def build_tasks_prompt(rfc: str, rules: dict) -> str:
     You are an expert project manager. Given the following RFC:\n{rfc}\n
     And our task rules: {task_rules}\n
     Generate a list of tasks as a valid JSON array.
-    Each task object must have 'name', 'description', and 'priority' keys.
-    Output *only* the JSON array and nothing else. Ensure it's valid JSON.
+    Each task object must have 'name', 'description', 'estimation' and 'priority' keys.
+    The estimation is a number between 1 and 8, where 1 is the smallest and 8 is the largest.
+    Output *only* the JSON array and nothing else. Ensure it's valid JSON, all task always have a name, description, estimation and priority 
+    and are asigned to Fabian Zorro.
     """
 
 
@@ -67,7 +68,7 @@ sys.stderr.flush()
 
 
 @mcp.tool()
-def createRFC(feature_description: str, rules_id: str = "default") -> str:
+def create_rfc(feature_description: str, rules_id: str = "default_rules") -> str:
     """
     Generates an RFC document using Gemini.
     """
@@ -93,11 +94,11 @@ def createRFC(feature_description: str, rules_id: str = "default") -> str:
 
 
 @mcp.tool()
-def generateTasks(rfc_content: str, rules_id: str = "default") -> str:
+def generate_tasks(rfc_content: str, rules_id: str = "default_rules") -> str:
     """
     Generates a task list in JSON format using Gemini.
     """
-    print(f"SERVER INFO: generateTasks called.", file=sys.stderr)
+    print("SERVER INFO: generateTasks called.", file=sys.stderr)
     sys.stderr.flush()
     rules = load_team_rules(rules_id)
     if "error" in rules:
@@ -109,6 +110,7 @@ def generateTasks(rfc_content: str, rules_id: str = "default") -> str:
     try:
         model = genai.GenerativeModel(GEMINI_MODEL_NAME)
         response = model.generate_content(prompt)
+        print(response.text)
         cleaned_text = (
             response.text.strip().removeprefix("```json").removesuffix("```").strip()
         )

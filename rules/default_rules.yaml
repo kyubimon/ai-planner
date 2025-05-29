@@ -1,4 +1,4 @@
-# rules/default.yaml
+# rules/default_rules.yaml
 # Default set of rules for the software development planning assistant.
 
 # --- RFC Generation Rules ---
@@ -6,34 +6,48 @@
 # Defines the Markdown template structure for generated RFCs.
 # Use '|' for a multi-line string.
 rfc_template: |
-  # RFC: [Feature Title]
+  # RFC: [RFC Title]
 
   **Date:** {{CURRENT_DATE}}
   **Author:** [Your Name/AI Assistant]
-  **Status:** Draft
+  **Status:** Draft # (e.g., Draft, In Review, Approved, Implemented)
 
-  ## 1. Summary
-  *A brief, one-paragraph explanation of the feature and the problem it solves.*
+  ## 1. TL;DR
+  * *A brief summary of the whole RFC.*
 
-  ## 2. Goals
+  ## 2. Motivation
+  * *Why are we doing this? What problem does it solve?*
   * *Specific, measurable objective 1.*
   * *Specific, measurable objective 2.*
 
-  ## 3. Non-Goals
+  ## 3. Goals
+  * *What this feature *will* achieve.*
+
+  ## 4. Non-Goals
   * *What this feature will *not* address.*
 
-  ## 4. Technical Approach
+  ## 5. Technical Approach
   * *High-level overview of the implementation.*
   * *Key components affected or created.*
   * *Data model changes (if any).*
   * *API design (if applicable).*
+  * *Diagrams (links or embedded).*
 
-  ## 5. Risks & Mitigation
+  ## 6. Dependencies
+  * *What must be done before this? What will rely on this?*
+
+  ## 7. Risks & Mitigation
   * *Potential technical or product risks.*
   * *How we plan to address these risks.*
 
-  ## 6. Alternatives Considered
+  ## 8. Rollout Plan
+  * *How will this be deployed and monitored?*
+
+  ## 9. Alternatives Considered
   * *Briefly mention other approaches and why this one was chosen.*
+
+  ## 10. Success Criteria
+  * *How will we measure the success of this change?*
 
 # --- General Development Rules ---
 
@@ -58,15 +72,24 @@ task_prioritization: "1. Security fixes. 2. Core backend logic. 3. API endpoints
 task_rules: |
   - Break down features into the smallest reasonable tasks (1-3 days effort max).
   - Ensure every backend change has a corresponding testing task.
+  - Each task must have clear Acceptance Criteria.
   - Create a 'Deploy & Monitor' task for significant features.
-  - Prefix backend tasks with '[BE]' and frontend tasks with '[FE]'.
+  - Prefix tasks: '[BE]', '[FE]', '[TEST]', '[DOCS]', '[INFRA]'.
   - Assign high priority to tasks involving authentication or data integrity.
   - Include a task for updating documentation if APIs or major features change.
+  - Encourage adding estimations (Story Points or time) during task creation.
+  - Estimation points are 1, 2, 3, 5, 8 where 1 is the smallest and 8 is the largest.
+  - 1 point task is a small change that can be done in less than a day.
+  - 2 point task is a medium change that can be done in at least one day.
+  - 3 point task is a large change that can be done in at least three days.
+  - 5 point task is a very large change that can be done in at least one week, normally used for uncertain tasks.
+  - 8 point task is a massive change that can be done in at least two weeks, normally used for very uncertain tasks.
+
 
 # --- Other Configurations ---
 
 # Default assignee for tasks if not specified.
-default_assignee: "Project Lead"
+default_assignee: "Fabian Zorro"
 
 # JIRA project key (if applicable).
 jira_project_key: "DEV"
